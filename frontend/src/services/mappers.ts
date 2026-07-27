@@ -203,7 +203,7 @@ export function mapCalificacionToGrade(dbCalificacion: any, studentId: string): 
     subjectId: String(dbCalificacion.plan?.id_asignatura || dbCalificacion.id_asignatura),
     lapso: lapso,
     evaluationId: `ev1-${dbCalificacion.id_plan}`,
-    score: dbCalificacion.escala?.nota_calculo || dbCalificacion.id_escala || 0,
+    score: dbCalificacion.escala?.nota_calculo ?? dbCalificacion.id_escala ?? 0,
     periodId: dbCalificacion.momento?.id_periodo || undefined,
   };
 }
@@ -284,14 +284,14 @@ export function mapNotaParcialToGrade(dbNota: any, studentId: string): Grade {
 
   const resolvedSubjectId = dbNota.evaluacion?.plan?.id_asignatura
     ? String(dbNota.evaluacion.plan.id_asignatura)
-    : (dbNota.matricula?.estudiante?.id_estudiante ? String(dbNota.matricula.estudiante.id_estudiante) : '');
+    : '';
 
   return {
     studentId: resolvedStudentId,
     subjectId: resolvedSubjectId,
     lapso: lapso,
     evaluationId: String(dbNota.id_evaluacion),
-    score: dbNota.id_escala || 0,
+    score: dbNota.escala?.nota_calculo ?? dbNota.id_escala ?? 0,
     periodId: dbNota.evaluacion?.momento?.id_periodo || undefined,
   };
 }

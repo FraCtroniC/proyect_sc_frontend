@@ -207,7 +207,7 @@ const SAFE_DELAY = 400;
 
 export const AuthController = {
   obtenerCsrfToken: wrapAsync(async (_req: Request, res: Response) => {
-    res.json({ ok: true });
+    res.json({ ok: true, csrfToken: res.locals.csrfToken });
   }),
 
   login: wrapAsync(async (req: Request, res: Response) => {

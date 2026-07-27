@@ -12,8 +12,23 @@ const app = express();
 
 app.set('trust proxy', 1);
 app.use(helmet());
+const allowedOrigins = [
+  environment.frontendUrl,
+  'file://',
+  'null',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+].filter(Boolean);
+
 app.use(cors({
-  origin: environment.frontendUrl || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
   credentials: true,
 }));
 app.use(morgan('dev'));

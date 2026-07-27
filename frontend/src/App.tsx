@@ -76,6 +76,8 @@ import ChatbotAsistente from './components/ChatbotAsistente';
 import UserProfileModal from './components/UserProfileModal';
 import { FormatEditor } from './components/FormatEditor/FormatEditor';
 
+const BACKEND_URL = import.meta.env.PROD ? (import.meta.env.VITE_BACKEND_URL || '') : '';
+
 const VenezuelaClock = () => {
   const [time, setTime] = useState(new Date());
 
@@ -146,7 +148,7 @@ export default function App() {
     toast.loading("Generando respaldo de la base de datos...", { id: 'backup-toast' });
     try {
       // Usaremos un endpoint directo que devuelve el blob
-      const response = await fetch('/api/system/backup', {
+      const response = await fetch(BACKEND_URL + '/api/system/backup', {
         credentials: 'include',
       });
       if (!response.ok) throw new Error('Fallo al respaldar');
@@ -377,7 +379,7 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+      await fetch(BACKEND_URL + '/api/auth/logout', { method: 'POST', credentials: 'include' });
     } catch { }
     setIsLoggedIn(false);
     setCurrentUser(null);
@@ -1941,7 +1943,7 @@ export default function App() {
               <div className="absolute left-3 top-0 w-10 h-10 bg-blue-500/30 blur-xl rounded-full"></div>
 
               <div className="h-11 w-11 bg-white rounded-xl shadow-lg shadow-blue-500/20 flex items-center justify-center border border-white/10 relative z-10 overflow-hidden p-0.5">
-                <img src="/logo_leo.jpg" alt="Logo LEO" className="h-full w-full object-contain rounded-lg" />
+                <img src="./logo_leo.jpg" alt="Logo LEO" className="h-full w-full object-contain rounded-lg" />
               </div>
 
               <div className="relative z-10 min-w-0">
@@ -2055,7 +2057,7 @@ export default function App() {
         <header id="mobile-nav-header" className="md:hidden bg-slate-900 text-slate-300 p-4 border-b border-slate-800 flex items-center justify-between sticky top-0 z-50">
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 bg-white shadow-md shadow-blue-500/20 rounded-lg flex items-center justify-center border border-white/10 overflow-hidden">
-              <img src="/logo_leo.jpg" alt="Logo LEO" className="h-full w-full object-cover" />
+              <img src="./logo_leo.jpg" alt="Logo LEO" className="h-full w-full object-cover" />
             </div>
             <div>
               <span className="block text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-200 uppercase tracking-widest leading-none mb-0.5">Estilita Orozco</span>

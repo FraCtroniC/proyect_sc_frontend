@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { User, UserRole } from '../types';
 
+const BACKEND_URL = import.meta.env.PROD ? (import.meta.env.VITE_BACKEND_URL || '') : '';
+
 interface LoginScreenProps {
   users: User[];
   onLogin: (user: User) => void;
@@ -87,7 +89,7 @@ export default function LoginScreen({ users, onLogin }: LoginScreenProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch(BACKEND_URL + '/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -164,7 +166,7 @@ export default function LoginScreen({ users, onLogin }: LoginScreenProps) {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/reset-password', {
+      const response = await fetch(BACKEND_URL + '/api/auth/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: resetToken, password: newPassword.trim() }),
@@ -199,7 +201,7 @@ export default function LoginScreen({ users, onLogin }: LoginScreenProps) {
 
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(BACKEND_URL + '/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ correo: resetEmail.trim() }),
@@ -246,7 +248,7 @@ export default function LoginScreen({ users, onLogin }: LoginScreenProps) {
         <div id="login-brand" className="text-center space-y-2 2xl:space-y-4">
           <div className="mx-auto h-20 w-20 2xl:h-24 2xl:w-24 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-slate-900/40 border-2 border-slate-400 overflow-hidden p-1.5 relative group">
             <div className="absolute inset-0 bg-slate-500/10 group-hover:bg-transparent transition-colors z-10 pointer-events-none"></div>
-            <img src="/logo_app.png" alt="Logo Sistema" className="h-full w-full object-contain relative z-0" />
+            <img src="./logo_app.png" alt="Logo Sistema" className="h-full w-full object-contain relative z-0" />
           </div>
           <div>
             <h1 className="text-white font-black text-lg md:text-xl 2xl:text-2xl tracking-widest uppercase block leading-tight">

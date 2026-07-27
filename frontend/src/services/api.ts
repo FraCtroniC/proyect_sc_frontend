@@ -1,5 +1,7 @@
+const BACKEND_URL = import.meta.env.PROD ? (import.meta.env.VITE_BACKEND_URL || '') : '';
+
 const SESSION_KEY = 'liceo-auth-session';
-const CSRF_COOKIE = 'csrf_token';
+let csrfTokenValue: string | null = null;
 
 function getSessionToken(): string | null {
   try {
@@ -16,8 +18,7 @@ function getSessionToken(): string | null {
 }
 
 function getCsrfToken(): string | null {
-  const match = document.cookie.match(new RegExp(`(^| )${CSRF_COOKIE}=([^;]+)`));
-  return match ? decodeURIComponent(match[2]) : null;
+  return csrfTokenValue;
 }
 
 type RequestOptions = RequestInit & {
@@ -55,7 +56,7 @@ async function request<T>(url: string, options: RequestOptions = {}): Promise<T>
     }
   }
 
-  let response = await fetch(finalUrl, {
+  let response = await fetch(BACKEND_URL + finalUrl, {
     ...options,
     headers,
     credentials: 'include',
@@ -65,7 +66,7 @@ async function request<T>(url: string, options: RequestOptions = {}): Promise<T>
     const newToken = await refreshSession();
     if (newToken) {
       headers.set('Authorization', `Bearer ${newToken}`);
-      response = await fetch(finalUrl, {
+      response = await fetch(BACKEND_URL + finalUrl, {
         ...options,
         headers,
         credentials: 'include',
@@ -113,7 +114,7 @@ async function refreshSession(): Promise<string | null> {
   refreshPromise = (async () => {
     try {
       const csrfToken = getCsrfToken();
-      const response = await fetch('/api/auth/refresh', {
+      const response = await fetch(BACKEND_URL + '/api/auth/refresh', {
         method: 'POST',
         credentials: 'include',
         headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
@@ -143,7 +144,11 @@ async function refreshSession(): Promise<string | null> {
 
 async function initCsrf() {
   try {
-    await fetch('/api/auth/csrf-token', { credentials: 'include' });
+    const res = await fetch(BACKEND_URL + '/api/auth/csrf-token', { credentials: 'include' });
+    const data = await res.json();
+    if (data.csrfToken) {
+      csrfTokenValue = data.csrfToken;
+    }
   } catch {}
 }
 
@@ -164,13 +169,13 @@ export const api = {
     const qs = searchParams.toString();
     let finalUrl = qs ? `${url}${url.includes('?') ? '&' : '?'}${qs}` : url;
 
-    let res = await fetch(finalUrl, { headers, credentials: 'include' });
+    let res = await fetch(BACKEND_URL + finalUrl, { headers, credentials: 'include' });
 
     if (res.status === 401) {
       const newToken = await refreshSession();
       if (newToken) {
         headers.set('Authorization', `Bearer ${newToken}`);
-        res = await fetch(finalUrl, { headers, credentials: 'include' });
+        res = await fetch(BACKEND_URL + finalUrl, { headers, credentials: 'include' });
       }
     }
 
@@ -203,7 +208,7 @@ export const api = {
     refresh: refreshSession,
     logout: async () => {
       const csrfToken = getCsrfToken();
-      await fetch('/api/auth/logout', {
+      await fetch(BACKEND_URL + '/api/auth/logout', {
         method: 'POST',
         credentials: 'include',
         headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
@@ -231,7 +236,7 @@ export const api = {
       if (token) headers['Authorization'] = `Bearer ${token}`;
       const csrfToken = getCsrfToken();
       if (csrfToken) headers['X-CSRF-Token'] = csrfToken;
-      const res = await fetch(`/api/historicos/${estudianteId}/generar-excel?plan=${plan}`, { headers, credentials: 'include' });
+      const res = await fetch(BACKEND_URL + `/api/historicos/${estudianteId}/generar-excel?plan=${plan}`, { headers, credentials: 'include' });
       if (!res.ok) {
         let msg = 'Error al generar el Excel';
         try { const err = await res.json(); msg = err.error?.message || msg; } catch {}

@@ -13,10 +13,13 @@ export function csrfProtection(req: Request, res: Response, next: NextFunction) 
       const token = crypto.randomUUID();
       res.cookie(CSRF_COOKIE, token, {
         httpOnly: false,
-        secure: environment.nodeEnv === 'production',
-        sameSite: environment.nodeEnv === 'production' ? 'none' : 'lax',
+        secure: true,
+        sameSite: 'none',
         maxAge: 24 * 60 * 60 * 1000,
       });
+      res.locals.csrfToken = token;
+    } else {
+      res.locals.csrfToken = req.cookies[CSRF_COOKIE];
     }
     return next();
   }

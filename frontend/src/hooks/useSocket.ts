@@ -19,9 +19,8 @@ export function useSocket(isLoggedIn: boolean, onEvent: (event: string, data: an
     const token = getSessionToken();
     if (!token) return;
 
-    const backendUrl = window.location.hostname === 'localhost'
-      ? '/'
-      : 'https://backend-sc-tbkn.onrender.com';
+    const BACKEND_URL = import.meta.env.PROD ? (import.meta.env.VITE_BACKEND_URL || '') : '';
+    const backendUrl = BACKEND_URL || '/';
 
     const socket = io(backendUrl, {
       auth: { token },

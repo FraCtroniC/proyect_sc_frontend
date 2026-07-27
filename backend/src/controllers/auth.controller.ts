@@ -206,8 +206,18 @@ const transporter = nodemailer.createTransport({
 const SAFE_DELAY = 400;
 
 export const AuthController = {
-  obtenerCsrfToken: wrapAsync(async (_req: Request, res: Response) => {
-    res.json({ ok: true, csrfToken: res.locals.csrfToken });
+  obtenerCsrfToken: wrapAsync(async (req: Request, res: Response) => {
+    let token = req.cookies?.csrf_token;
+    if (!token) {
+      token = crypto.randomUUID();
+      res.cookie('csrf_token', token, {
+        httpOnly: false,
+        secure: true,
+        sameSite: 'none',
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+    }
+    res.json({ ok: true, csrfToken: token });
   }),
 
   login: wrapAsync(async (req: Request, res: Response) => {

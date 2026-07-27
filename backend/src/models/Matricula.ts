@@ -1,4 +1,5 @@
 import { Model, DataTypes, Sequelize } from 'sequelize';
+import { Seccion } from './Seccion';
 
 export class Matricula extends Model {
   declare id_matricula: number;
@@ -9,6 +10,8 @@ export class Matricula extends Model {
   declare estatus_matricula: string | null;
   declare readonly created_at: Date;
   declare readonly updated_at: Date | null;
+
+  declare seccion?: Seccion;
 
   static associate(models: any) {
     Matricula.belongsTo(models.Estudiante, { foreignKey: 'id_estudiante', as: 'estudiante' });
